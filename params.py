@@ -1,6 +1,6 @@
 # _______________________ DATA SET _____________________
 ts_number = "ecg"  #coffee, olive_oil, ecg, sinus, traveled_miles
-alphabet_size = 6
+alphabet_size = 7
 
 # _____________________ PREPROCESSING _______________________
 
@@ -10,7 +10,7 @@ power_transformation = False
 # PAA
 number_to_reduce = 10
 reduce_ts_with_max_series_length = True
-max_series_length = 100
+max_series_length = 500
 paa = True
 
 # Smoothing
@@ -24,7 +24,7 @@ z_norm = False
 
 
 # ________________________ SEARCH _______________________
-kind_of_search = "fs"  # hs, fs
+kind_of_search = "hs"  # hs, fs
 
 
 # ____________________ SAX PARAMETER _______________________
@@ -53,3 +53,7 @@ steps_to_overjump = 3
 
 # _________________ NEW TGS _________________-
 check_if_other_center_would_be_better = True
+
+
+# Diff TEST
+use_other_diff_methode = True

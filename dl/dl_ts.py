@@ -7,8 +7,6 @@ import dl.dl_helper as h
 # encode costs of a spezific change at a position + 1 as indicatorbit for saying if + or -
 def calculate_mdl_for_ts(mdl_deviation, len_pattern_list, len_pattern, len_sax, a_size,
                          logs=False):
-    # List to fill if Segments are different from init segment
-    mdl_difference_all = []
     # Length of segments
     len_segments = h.log_star(len_pattern)
     # Frequency of segments

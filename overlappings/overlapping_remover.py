@@ -23,7 +23,7 @@ def calc_mdl_for_all_possible_centers(diff1, diff2, mdl):
     k = len(diff1[0])
     for i in list_zero[:int(len(list_zero) / 2)]:
         difference_array = get_difference_array_double(diff1[i[0]], diff2[i[0]], diff1[i[1]], diff2[i[1]])
-        sum_of_position_of_changes = k - difference_array.count(0)
+        sum_of_position_of_changes = k - np.count_nonzero(difference_array == 0)
         mdl_val = 1.51 if sum_of_position_of_changes == 0 else calc_mdl_for_distance_array(sum_of_position_of_changes, k,
                                                                                            difference_array)
         a[i[0], i[1]] = mdl_val
@@ -45,7 +45,7 @@ def get_small_candidate_list(index_list, mdl_deviation_list, s):
         = get_optimized_list_with_pulp(s.words, candidate, mdl_deviation, s.words_numeric, s.words_numeric_2)
     return pattern_list, pattern_list_numeric, pattern_list_numeric_2, index_list, mdl_deviation_list
 
-
+# TODO remove indexlist like: [[3, 61], [72, 130], [73, 131], [75, 133], [108, 166], [110, 168]]
 def remove_overlapping(candidate_list, index_list, mld_list,s, motifs):
     if len(candidate_list) > 0:
         for pattern_list, index_list, mdl_deviation_list in zip(candidate_list, index_list, mld_list):
@@ -77,3 +77,8 @@ def remove_overlapping(candidate_list, index_list, mld_list,s, motifs):
             if len(pattern_list) > 1:
                 motifs.set_lists(s.k, pattern_list, index_list, mdl_deviation_list)
     return motifs
+
+#[*[1, 35], *[36, 70],       [70, 104],          *[71, 105],         [105, 139],      [106, 140], [108, 142],    [140, 174],       [141, 175],          [142, 176]]
+#[*1.51, *71.87515105881138, 34.868418731366205, *9.606030207615188, 85.23960101304866, 1.51, 85.23960101304866, 86.23960101304866, 32.868418731366205, 8.606030207615188]
+
+# 1.51, 71.8, 9.6, 1.51, 8.6

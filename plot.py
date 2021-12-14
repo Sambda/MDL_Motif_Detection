@@ -4,6 +4,14 @@ import params as p
 from matplotlib.gridspec import GridSpec
 
 
+# Plot results
+def print_final_result(list_of_pattern, series_original, number_of_reducing):
+    for i, d in enumerate(list_of_pattern):
+        path = ""
+        plot_final_results(list_of_pattern[d], series_original, number_of_reducing,
+                               path + "_" + str(d))
+
+
 def simple_plot(ts, title="", x_label='', y_label = ''):
     plt.figure(figsize=(15, 4))
     plt.plot(list(range(len(ts))), ts)
@@ -123,10 +131,10 @@ def hist_plot(x, y):
 
 
 def run_time_plot(x, y, y2=[], y3=[], title = ""):
-    plt.figure(figsize=(10, 4))
-    plt.plot(x, y)
+    plt.figure(figsize=(10, 5))
+    plt.plot(x, y, marker = 'o')
     # plt.plot(x, y2)
     # plt.plot(x, y3)
     plt.gca().invert_xaxis()
-    plt.title("Runtime ")
+    plt.title(title)
     plt.show()

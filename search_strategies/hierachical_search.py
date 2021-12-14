@@ -3,10 +3,16 @@ import dl.dl_helper as dl_helper
 import params as p
 from dl.dl_ts import calculate_mdl_for_ts
 import objects.ts_object as ts_obj
-import search_strategies.search_helper as search_helper
 from search_strategies.search_whole_ts import get_motifs_for_whole_ts
 import time
 from plot import plot_final_results, run_time_plot
+
+
+def create_word_lists(x, k):
+    words = []
+    for i in range(len(x) - k + 1):
+        words.append(x[i: i + k])
+    return words
 
 
 # Get search Area for hierachical search
@@ -41,20 +47,22 @@ def get_area_k_secound_search(list_of_ks):
 def start_search(series, area_list):
     # Move pattern search always two percent further.
     # TODO better way for percentage_skip
-    percentage_skip = int(series.len_sax/100)
-    range_to_skip = percentage_skip if percentage_skip > 1 else 1
+    percentage_skip = int(series.len_sax/50)
+    range_to_skip = percentage_skip if percentage_skip > 1 else 5
 
     # Get best Motifs in range of k
     dict_best_motif = get_the_best_k(series, area_list[0], area_list[1], range_to_skip)
+    print("dict_best_motif: {}".format(dict_best_motif["k"]))
     # Search again around the best k
     # If the highest possible k was best/maybe because no pattern was found skip this step
-    if p.search_again_in_neighborhood and "k" in dict_best_motif and dict_best_motif['k'] != area_list[1]:
+    if range_to_skip > 1 and "k" in dict_best_motif:# and dict_best_motif['k'] != area_list[1]:
         print("------")
-        range_to_skip = range_to_skip if range_to_skip > 2 else 3
+        #range_to_skip = range_to_skip if range_to_skip > 2 else 3
         start, end = dict_best_motif["k"] - range_to_skip+1, dict_best_motif["k"] + range_to_skip
         start = area_list[0] if start <= area_list[0] else start
         end = area_list[1] if end >= area_list[1] else end
         dict_best_motif = get_the_best_k(series, start, end)
+        print("dict_best_motif2: {}".format(dict_best_motif["k"]))
     return dict_best_motif
 
 
@@ -63,23 +71,21 @@ def get_the_best_k(series, start, end, range_to_search=1):
     # runtime_x = []
     # runtime_y = []
     # runtime_y_middle = []
-    # start = 6
 
     dict_best_pattern_all = {"mdl": np.inf}
     for k in range(start, end, range_to_search):
         print("k:", k)
 
-        time_start_k = time.time()
+        # time_start_k = time.time()
 
-        words = search_helper.create_word_lists(series.sax, k)
-        words_numeric = search_helper.create_word_lists(series.sax_numeric, k)
-        words_numeric_2 = search_helper.create_word_lists(series.sax_numeric_2, k) if series.double else []
+        words = create_word_lists(series.sax, k)
+        words_numeric = create_word_lists(series.sax_numeric, k)
+        words_numeric_2 = create_word_lists(series.sax_numeric_2, k) if series.double else []
 
         dict_best_pattern = {"mdl": series.worst_case, "pattern_1": [""],
                              "pattern_2": [""], "k": int(series.len_sax / 2),
                              "index_1": [0, int(series.len_sax / 2)],
-                             "index_2": [int(series.len_sax / 2), series.len_sax],
-                             "worst_case": series.worst_case}
+                             "index_2": [int(series.len_sax / 2), series.len_sax]}
 
         # Runtime Plot
         # time_after_words_creation = time.time()
@@ -88,8 +94,6 @@ def get_the_best_k(series, start, end, range_to_search=1):
 
         # Mdl cost if difference is 0
         mdl_for_zero_difference = 1.51
-
-        exp_way = dl_helper.log_2(k, series.alphabet_size)
 
         for index_1, word_1 in enumerate(words[:-1]):
             if "W" not in word_1:
@@ -106,7 +110,8 @@ def get_the_best_k(series, start, end, range_to_search=1):
                                                                                  words_numeric_2[index_2])
 
                         # On how many positions something have to be changed
-                        sum_of_position_of_changes = k - difference_array.count(0)
+                        #sum_of_position_of_changes = k - difference_array.count(0)
+                        sum_of_position_of_changes = k - np.count_nonzero(difference_array == 0)
 
                         if sum_of_position_of_changes == 0:
                             mdl_deviation = mdl_for_zero_difference
@@ -117,14 +122,13 @@ def get_the_best_k(series, start, end, range_to_search=1):
                         mdl = calculate_mdl_for_ts([mdl_deviation], 2, k, series.len_sax, series.alphabet_size)
 
                         if dict_best_pattern["mdl"] > mdl and mdl < series.worst_case:
-                            # dict_best_pattern["mdl"] = mdl
-                            dict_best_pattern["mdl"] = mdl_deviation
+                            dict_best_pattern["mdl"] = mdl
+                            dict_best_pattern["mdl_dev"] = mdl_deviation
                             dict_best_pattern["pattern_1"] = [word_1]
                             dict_best_pattern["pattern_2"] = [word_2]
                             dict_best_pattern["k"] = k
                             dict_best_pattern["index_1"] = [index_1, index_1 + k]
                             dict_best_pattern["index_2"] = [index_2, index_2 + k]
-                            dict_best_pattern["worst_case"] = series.worst_case
 
         # Runtine plot
         # time_end_k = time.time()

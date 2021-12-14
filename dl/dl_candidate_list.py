@@ -29,6 +29,7 @@ def mdl_for_candidate_list(subsequence, series):
     for index_1, word_1 in enumerate(subsequence.words[:-1]):
         pattern_list = []
         if index_1 not in indexes_to_skip:
+
             if "W" not in subsequence.words_numeric[index_1]:
                 # Add target candidate to list
                 pattern_list = [word_1]
@@ -42,16 +43,18 @@ def mdl_for_candidate_list(subsequence, series):
                     index_2 = index_2 + index_2_to_skip * k
                     if index_2 < end_pos:
                         if "W" not in subsequence.words_numeric[index_2]:
+
                             # Sum of difference between word_1 and word_2
                             difference_array = dl_helper.get_difference_array_double(subsequence.words_numeric[index_1], subsequence.words_numeric_2[index_1], subsequence.words_numeric[index_2],
-                                                                             subsequence.words_numeric_2[index_2]) \
+                                                                                     subsequence.words_numeric_2[index_2]) \
                                 if p.double_sax else dl_helper.get_difference_array(subsequence.words_numeric[index_1], subsequence.words_numeric[index_2])
 
                             # On how many positions something have to be changed
-                            sum_of_position_of_changes = k - difference_array.count(0)
+                            #sum_of_position_of_changes = k - difference_array.count(0)
+                            sum_of_position_of_changes = k - np.count_nonzero(difference_array == 0)
                             # Only got further if sum of position changes is under threshold
                             # TODO threshold
-                            #if sum_of_position_of_changes <= series.dict_threshold[k]:
+                            # if sum_of_position_of_changes <= series.dict_threshold[k]:
 
                             if sum_of_position_of_changes == 0:
                                 indexes_to_skip.append(index_2)

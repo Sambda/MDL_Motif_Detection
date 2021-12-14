@@ -5,15 +5,8 @@ from search_strategies.hierachical_search import start_hierachical_search
 from search_strategies.flat_search import start_flat_search
 from utils.runtime_helper import get_min_possible_size
 from objects.ts_object import set_series_object
-from plot import plot_final_results, simple_plot
-
-
-# Plot results
-def print_final_result(list_of_pattern, series_original, number_of_reducing):
-    for i, d in enumerate(list_of_pattern):
-        path = ""
-        plot_final_results(list_of_pattern[d], series_original, number_of_reducing,
-                               path + "_" + str(d))
+from plot import plot_final_results, simple_plot, print_final_result
+from search_strategies.second_motif_search_init import set_new_conditions
 
 
 # Start Search
@@ -24,6 +17,25 @@ def start_search(strategy, series_original):
     elif strategy == "fs":
         list_pattern = start_flat_search(series_original)
     return list_pattern
+
+
+# Start search_for_second_motif
+def start_search_for_second_motif(indexes_of_pattern, series, number_of_reducing):
+    # Calculate the Size und the breaks of the rest of the unused points in TS
+    for key, value in indexes_of_pattern.items():
+        ts, ts_norm, original_index, length_of_tss = set_new_conditions(value['indexes'], series.ts, series.ts_norm, number_of_reducing)
+
+        series_search_2 = set_series_object(ts, ts_norm, series.data_number, series.alphabet_size, series.power_transformation, series.min_pattern_size_non_reduce, length_of_tss)
+            # Search again in not used Areas
+   #         list_of_pattern, series, indexes = first_search(number_of_reducing, series, Logger, series_original,
+    #                                                        original_index)
+
+
+   # if len(ts_norm) > series_original.min_pattern_size_non_reduce * 2 + 1:
+  #      series = u.set_series_object(ts, ts_norm, data_number, alphabet_size, power, min_k, list_of_breaks)
+  #      # Search again in not used Areas
+  #      list_of_pattern, series, indexes = first_search(number_of_reducing, series, Logger, series_original,
+  #                                                      original_index)
 
 
 def run_main():
@@ -47,11 +59,15 @@ def run_main():
     # Start first search
     list_of_pattern = start_search(p.kind_of_search, series_original)
 
-    time_end = time.time()
-    print(round(((time_end - time_start)/60), 2),  " Minutes")
-
     # Print final plot for first search
     print_final_result(list_of_pattern, series_original, number_of_reducing)
+
+    #list_of_pattern_2 = start_search_for_second_motif(list_of_pattern, series_original, number_of_reducing)
+
+
+    # Plot time
+    time_end = time.time()
+    print(round(((time_end - time_start)/60), 2),  " Minutes")
 
 
 if __name__ == "__main__":

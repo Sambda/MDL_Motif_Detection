@@ -5,7 +5,7 @@ import re
 import params as p
 from preprocessing.sax import apply_sax
 import copy
-
+import numpy as np
 
 # Define class
 class Series(object):
@@ -38,6 +38,7 @@ def create_number_series(string, list_alphabet):
     for i, j in enumerate(list_alphabet):
         i += 1
         string = re.sub(str(j), str(i), string)
+    string = np.array(list(map(int, string)))
     return string
 
 
