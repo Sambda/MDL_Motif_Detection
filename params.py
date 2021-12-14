@@ -10,7 +10,7 @@ power_transformation = False
 # PAA
 number_to_reduce = 10
 reduce_ts_with_max_series_length = True
-max_series_length = 500
+max_series_length = 300
 paa = True
 
 # Smoothing

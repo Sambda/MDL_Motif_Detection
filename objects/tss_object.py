@@ -2,23 +2,14 @@ def create_word_lists(x, k):
     words = []
     for i in range(len(x) - k + 1):
         words.append("".join(x[i: i + k]))
-
-    return words
-
-
-def create_word_lists_array(x, k):
-    words = []
-    for i in range(len(x) - k + 1):
-        words.append(x[i: i + k])
-
     return words
 
 
 def set_subsequence_object(k, series):
     subsequence = Subsequences(k)
     subsequence.words = create_word_lists(series.sax, k)
-    subsequence.words_numeric = create_word_lists_array(series.sax_numeric, k)
-    subsequence.words_numeric_2 = create_word_lists_array(series.sax_numeric_2, k) if series.double else []
+    subsequence.words_numeric = create_word_lists(series.sax_numeric, k)
+    subsequence.words_numeric_2 = create_word_lists(series.sax_numeric_2, k) if series.double else []
     return subsequence
 
 

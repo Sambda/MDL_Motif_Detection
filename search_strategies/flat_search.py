@@ -1,7 +1,6 @@
 from search_strategies.search_whole_ts import get_motifs_for_whole_ts
 import params as p
 
-
 # Define k area for searching T
 def get_area_k_flat_search(series, overjump):
     return list(range(int(series.len_sax/2), series.min_pattern_size_non_reduce, -overjump))

@@ -49,9 +49,9 @@ def mdl_for_candidate_list(subsequence, series):
                                                                                      subsequence.words_numeric_2[index_2]) \
                                 if p.double_sax else dl_helper.get_difference_array(subsequence.words_numeric[index_1], subsequence.words_numeric[index_2])
 
+
                             # On how many positions something have to be changed
-                            #sum_of_position_of_changes = k - difference_array.count(0)
-                            sum_of_position_of_changes = k - np.count_nonzero(difference_array == 0)
+                            sum_of_position_of_changes = k - difference_array.count(0)
                             # Only got further if sum of position changes is under threshold
                             # TODO threshold
                             # if sum_of_position_of_changes <= series.dict_threshold[k]:
