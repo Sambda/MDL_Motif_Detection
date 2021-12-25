@@ -1,0 +1,31 @@
+LOGGING:
+Data : ecg 
+Alphabet size: 7 
+Power Transformation: False
+Length TS: 2500 
+PAA Length TS: 83
+Double Sax: True 
+Smooth: True 
+Smooth Fraction: 0.01
+Z-Normalisation: True 
+Breakpoint setting Value: 0.8
+Kind of breakpoints: density
+Window size PAA: 30,
+DL_sax: 233.01
+
+List of k's: [[28], [14, 14], [7, 7]]
+SEARCH AREA: [[], [13], [27]]
+
+__________ BEST MOTIFS ___________
+Motif 0
+Length: 13
+Pattern: [['aegebaggdacef'], ['aegebbggcbceg'], ['acgecadgfbbfe'], ['cegfbaggdacff']]
+Indexes: [[13, 26], [32, 45], [46, 59], [65, 78]]
+MDL: 181.53
+
+Motif 1
+Length: 27
+Pattern: ['agddcbdgfbaegebaggdacefdadf', 'bbfedceccbcegfbaggdacffdaef']
+Indexes: [[3, 30], [55, 82]]
+MDL: 212.79999999999998
+
