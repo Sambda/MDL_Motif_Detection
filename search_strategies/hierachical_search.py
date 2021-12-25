@@ -48,9 +48,9 @@ def start_search(series, area_list):
     dict_best_motif = get_the_best_k(series, area_list[0], area_list[1], range_to_skip)
     # Search again around the best k
     # If the highest possible k was best/maybe because no pattern was found skip this step
-    if p.search_again_in_neighborhood and "k" in dict_best_motif and dict_best_motif['k'] != area_list[1]:
+    if p.search_again_in_neighborhood and "k" in dict_best_motif and dict_best_motif['k'] != area_list[1] and range_to_skip != 1:
         print("------")
-        range_to_skip = range_to_skip if range_to_skip > 2 else 3
+        range_to_skip = range_to_skip if range_to_skip > 1 else 2
         start, end = dict_best_motif["k"] - range_to_skip+1, dict_best_motif["k"] + range_to_skip
         start = area_list[0] if start <= area_list[0] else start
         end = area_list[1] if end >= area_list[1] else end
@@ -58,12 +58,7 @@ def start_search(series, area_list):
     return dict_best_motif
 
 
-def get_the_best_k(series, start, end, range_to_search=1):
-    # for runtime measures
-    # runtime_x = []
-    # runtime_y = []
-    # runtime_y_middle = []
-    # start = 6
+def get_the_best_k(series, start, end, range_to_search="1"):
 
     dict_best_pattern_all = {"mdl": np.inf}
     for k in range(start, end, range_to_search):
@@ -164,7 +159,7 @@ def start_pattern_search_smaller_series(series, dict_tree, level):
     return list_of_dicts_per_level, list_of_ks
 
 
-def start_hierachical_search(series_original):
+def start_hierachical_search(series_original, logger):
 
     list_of_ks = []
 
@@ -187,6 +182,8 @@ def start_hierachical_search(series_original):
         # Take Motifs with lower MDL for the next search
         dict_tree = dict_list[0] if dict_list[0]["mdl"] <= dict_list[1]["mdl"] else dict_list[1]
     search_area = get_area_k_secound_search(list_of_ks)
+    logger.set_text("\nList of k's: {}".format(list_of_ks))
+    logger.set_text("SEARCH AREA: {}\n".format(search_area))
 
     # Restart search for spezifiy k's in whole ts
     list_of_pattern = get_motifs_for_whole_ts(series_original, list(np.unique(sum(search_area, []))))

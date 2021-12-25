@@ -5,15 +5,15 @@ from search_strategies.hierachical_search import start_hierachical_search
 from search_strategies.flat_search import start_flat_search
 from utils.runtime_helper import get_min_possible_size
 from objects.ts_object import set_series_object
-from plot import plot_final_results, simple_plot
-import os
-from plot import print_final_result
+from plot import simple_plot
+from plot import print_final_result, create_path_for_plot_saving
+from Logging.logger_setup import init_logger
 
 
 # Start Search
-def start_search(strategy, series_original):
+def start_search(strategy, series_original, logger):
     if strategy == "hs":
-        list_pattern = start_hierachical_search(series_original)
+        list_pattern = start_hierachical_search(series_original, logger)
 
     elif strategy == "fs":
         list_pattern = start_flat_search(series_original)
@@ -36,18 +36,25 @@ def run_main(data_name):
     # Set Original Series Object
     series_original = set_series_object(ts, ts_norm, ts_number, alphabet_size, min_k)
 
+    # Init Logger
+    path = create_path_for_plot_saving(data_name, series_original)
+    logger = init_logger(series_original, path)
+
     # Plot reduced data
     simple_plot(series_original.ts, "Original Data")
     simple_plot(series_original.ts_norm, "Reduced Data")
 
     # Start first search
-    list_of_pattern = start_search(p.kind_of_search, series_original)
+    list_of_pattern = start_search(p.kind_of_search, series_original, logger)
+
+    # Log list
+    logger.set_best_motifs(list_of_pattern)
 
     time_end = time.time()
     print(round(((time_end - time_start)/60), 2),  " Minutes")
 
     # Print final plot for first search
-    print_final_result(list_of_pattern, series_original, p.number_to_reduce, data_name)
+    print_final_result(list_of_pattern, series_original, p.number_to_reduce, data_name, path)
 
 
 if __name__ == "__main__":

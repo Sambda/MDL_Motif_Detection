@@ -115,8 +115,7 @@ def create_path_for_plot_saving(data_name, series):
 
 
 # Plot results
-def print_final_result(list_of_pattern, series, number_of_reducing, data_name):
-    path = create_path_for_plot_saving(data_name, series)
+def print_final_result(list_of_pattern, series, number_of_reducing, data_name, path):
     for i, d in enumerate(list_of_pattern):
         pattern = list_of_pattern[d]
         indexes = [[i[0] * number_of_reducing, i[1] * number_of_reducing] for i in
@@ -142,8 +141,8 @@ def print_final_result(list_of_pattern, series, number_of_reducing, data_name):
         ax.set_xlabel(x_axis_text)
         plt.title(title)
         if p.save:
-            path = path + str(pattern['k'])
-            plt.savefig(path, dpi=400, bbox_inches='tight')
+            path_plot = path + str(pattern['k'])
+            plt.savefig(path_plot, dpi=400, bbox_inches='tight')
         plt.show()
 
 

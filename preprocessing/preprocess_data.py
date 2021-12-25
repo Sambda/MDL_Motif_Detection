@@ -70,7 +70,7 @@ def preprocess_data(ts):
         #simple_plot(ts, "z_norm")
 
     # Smooth TS
-    if p.smooth_fraction:
+    if p.smooth:
         ts = smooth_data(ts)
         #simple_plot(ts, "smooth_fraction")
 

@@ -12,13 +12,13 @@ def log_star(integer):
             cost += last_interim_result
             last_interim_result = np.log2(last_interim_result)
     const = np.log2(2.865064)
-    return cost + const
+    return round(cost + const, 2)
 
 
 # c * log2(n)
 def log_2(c, n):
     x = c * math.log2(n)
-    return x
+    return round(x,2)
 
 
 # calc the array between two strings: abc,abb,abb -> [0,0,1] | aab,cbb,cbb -> [2,1,0]

@@ -14,6 +14,7 @@ max_series_length = 600
 paa = True
 
 # Smoothing
+smooth = True
 smooth_fraction = 0.01
 
 # Differencing
