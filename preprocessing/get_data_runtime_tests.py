@@ -4,6 +4,8 @@ from saxpy.znorm import znorm
 import random
 from scipy.io import arff
 from preprocessing.preprocess_data import preprocess_data
+import params as p
+
 
 
 def read_data(index):
@@ -14,7 +16,7 @@ def read_data(index):
         ts = sum(ts, [])
     elif index == "olive":
         ts = np.loadtxt('/Users/steffi/Downloads/OliveOil/OliveOil_Test.txt')
-        ts = ts[0: 20].tolist()
+        ts = ts[0: 15].tolist()
         ts = [j for i in ts for j in i]
     elif index == "coffee":
         ts = np.loadtxt('/Users/steffi/Downloads/Coffee/Coffee_TEST.txt')
@@ -90,13 +92,15 @@ def read_data(index):
     ts = np.array(ts)
     ts = znorm(ts)
 
-    if index =="olive":
-        pass
-    elif len(ts > 1000):
-        ts = ts[0:2500]
-    else:
-        ts = ts[0:300]
+    #if index =="olive":
+    #    pass
+    #elif len(ts > 1000):
+    #ts = ts[0:3000]
+   # else:
+    #    ts = ts[0:300]
 
     ts_norm = preprocess_data(ts)
+    ts_norm = ts_norm[0:250]
+    ts = ts[0:250*p.number_to_reduce]
 
     return ts, ts_norm

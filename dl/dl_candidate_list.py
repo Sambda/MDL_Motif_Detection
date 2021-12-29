@@ -5,13 +5,13 @@ import params as p
 
 def mdl_for_candidate_list(subsequence, series):
     k = subsequence.k
-    pattern_list_all, index_list_all, mdl_deviation_list_all = [], [], []
+    candidate_list_tss_all, candidate_list_indexes_all, candidate_list_dl_dev_all = [], [], []
 
     # Bad encoding for compairing with MDL
-    exp_way = dl_helper.log_2(subsequence.k, series.alphabet_size)
+    dl_sax = dl_helper.log_2(subsequence.k, series.alphabet_size)
 
-    # Location of pattern + Indicatorbit
-    alphabet_size_mdl_cost = dl_helper.log_2(1, series.len_sax) #+ 1
+    # Location of pattern
+    dl_dev_4 = dl_helper.log_2(1, series.len_sax)
 
     # Mdl cost if difference is 0
     mdl_for_zero_difference = 1.51
@@ -19,7 +19,7 @@ def mdl_for_candidate_list(subsequence, series):
     # If a word already is in candidate list with dist 0 to target word not necessary to look at it again, skip it.
     indexes_to_skip = []
 
-    word_1_index_before = 0
+    tgs_index_before = 0
     word_1_mdl_sum_before = np.inf
     word_1_len_candidate_list_before = 0
 
@@ -27,13 +27,13 @@ def mdl_for_candidate_list(subsequence, series):
     index_2_to_skip = 0
 
     for index_1, word_1 in enumerate(subsequence.words[:-1]):
-        pattern_list = []
+        candidate_list_tss = []
         if index_1 not in indexes_to_skip:
             if "W" not in subsequence.words_numeric[index_1]:
                 # Add target candidate to list
-                pattern_list = [word_1]
-                index_list = [[index_1, index_1 + k]]
-                mdl_deviation_list = [mdl_for_zero_difference]
+                candidate_list_tss = [word_1]
+                candidate_list_indexes = [[index_1, index_1 + k]]
+                candidate_list_dl_dev = [mdl_for_zero_difference]
 
                 start_pos = index_1 + k
                 end_pos = len(subsequence.words)
@@ -55,42 +55,49 @@ def mdl_for_candidate_list(subsequence, series):
 
                             if sum_of_position_of_changes == 0:
                                 indexes_to_skip.append(index_2)
-                                mdl_now = mdl_for_zero_difference
+                                dl_dev = mdl_for_zero_difference
                             else:
-                                mdl_now = dl_helper.calc_mdl_for_distance_array(sum_of_position_of_changes, k, difference_array)
+                                dl_dev = dl_helper.calc_mdl_for_distance_array(sum_of_position_of_changes, k, difference_array)
 
-                            if mdl_now + alphabet_size_mdl_cost < exp_way:
+                            if dl_dev + dl_dev_4 < dl_sax:
 
-                                if index_2 - index_list[-1][0] == 1:
-                                    if mdl_now >= mdl_deviation_list[-1]:
+                                if index_2 - candidate_list_indexes[-1][0] == 1:
+                                    if dl_dev >= candidate_list_dl_dev[-1]:
                                         pass
                                     else:
-                                        pattern_list.append(subsequence.words[index_2])
-                                        index_list.append([index_2, index_2 + k])
-                                        mdl_deviation_list.append(mdl_now)
+                                        # TODO: evaluate difference candidate list
+                                        # Delete old candidate
+                                        candidate_list_tss = candidate_list_tss[:-1]
+                                        candidate_list_indexes = candidate_list_indexes[:-1]
+                                        candidate_list_dl_dev = candidate_list_dl_dev[:-1]
+                                        # Add new candidate
+                                        candidate_list_tss.append(subsequence.words[index_2])
+                                        candidate_list_indexes.append([index_2, index_2 + k])
+                                        candidate_list_dl_dev.append(dl_dev)
 
                                         if sum_of_position_of_changes_old <= sum_of_position_of_changes:
                                             index_2_to_skip = index_2_to_skip + 1
                                 else:
-                                    pattern_list.append(subsequence.words[index_2])
-                                    index_list.append([index_2, index_2 + k])
-                                    mdl_deviation_list.append(mdl_now)
+                                    candidate_list_tss.append(subsequence.words[index_2])
+                                    candidate_list_indexes.append([index_2, index_2 + k])
+                                    candidate_list_dl_dev.append(dl_dev)
 
                         sum_of_position_of_changes_old = sum_of_position_of_changes
 
-            if len(pattern_list) > 1:
-                if index_1 - word_1_index_before == 1 and len(pattern_list) >= word_1_len_candidate_list_before and len(pattern_list_all)>0:
-                    if sum(mdl_deviation_list) < word_1_mdl_sum_before:
-                        pattern_list_all[-1] = pattern_list
-                        index_list_all[-1] = index_list
-                        mdl_deviation_list_all[-1] = mdl_deviation_list
+            if len(candidate_list_tss) > 1:
+                if index_1 - tgs_index_before == 1 and len(candidate_list_tss) >= word_1_len_candidate_list_before and len(
+                        candidate_list_tss_all) > 0:
+                    if sum(candidate_list_dl_dev) < word_1_mdl_sum_before:
+                        candidate_list_tss_all[-1] = candidate_list_tss
+                        candidate_list_indexes_all[-1] = candidate_list_indexes
+                        candidate_list_dl_dev_all[-1] = candidate_list_dl_dev
                 else:
-                    pattern_list_all.append(pattern_list)
-                    index_list_all.append(index_list)
-                    mdl_deviation_list_all.append(mdl_deviation_list)
+                    candidate_list_tss_all.append(candidate_list_tss)
+                    candidate_list_indexes_all.append(candidate_list_indexes)
+                    candidate_list_dl_dev_all.append(candidate_list_dl_dev)
 
-                word_1_index_before = index_1
-                word_1_mdl_sum_before = sum(mdl_deviation_list)
-                word_1_len_candidate_list_before = len(pattern_list)
+                tgs_index_before = index_1
+                word_1_mdl_sum_before = sum(candidate_list_dl_dev)
+                word_1_len_candidate_list_before = len(candidate_list_tss)
 
-    return pattern_list_all, index_list_all, mdl_deviation_list_all
+    return candidate_list_tss_all, candidate_list_indexes_all, candidate_list_dl_dev_all

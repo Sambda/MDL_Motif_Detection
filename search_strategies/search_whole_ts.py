@@ -7,6 +7,7 @@ import numpy as np
 from dl.dl_ts import calculate_mdl_for_ts
 import time
 from plot import run_time_plot
+import pandas as pd
 
 
 # calculate MDL encoding for motifs, sorted by cheapness per amount of motifs per cluster
@@ -17,8 +18,7 @@ def calculate_mdl_for_motifs(motifs, series):
     for i, pattern_list in enumerate(motifs.candidates):
         len_pattern = motifs.k_list[i]
         pattern_list_len = len(pattern_list)
-        mdl = calculate_mdl_for_ts(motifs.mdl_dev[i], pattern_list_len, len_pattern, series.len_sax,
-                                     series.alphabet_size, True)
+        mdl = calculate_mdl_for_ts(motifs.mdl_dev[i], pattern_list_len, len_pattern, series.len_sax, series.alphabet_size, True)
 
         if mdl < series.worst_case:
             if min_mdl >= mdl:
@@ -35,8 +35,10 @@ def get_motifs_for_whole_ts(series, search_area_all):
           "\n_________________________________")
     motifs = Motifs()
     list_best_pattern_for_k = {}
-    runtime_x = []
-    runtime_y = []
+
+    df_motifs = pd.DataFrame({'k': pd.Series(dtype='int'), 'runtime': pd.Series(dtype='float'),
+                              'motif_amount': pd.Series(dtype='int'), 'tss_amount': pd.Series(dtype='int'),
+                              'point_amount': pd.Series(dtype='int')})
     for k in search_area_all:
         time_start_k = time.time()
 
@@ -58,11 +60,13 @@ def get_motifs_for_whole_ts(series, search_area_all):
         if len(dict_best_pattern_for_k) > 0:
             list_best_pattern_for_k[k] = dict_best_pattern_for_k
             list_best_pattern_for_k[k]["k"] = k
-        time_end_k = time.time()
-        time_sum_k = round(((time_end_k - time_start_k) / 60), 4)
-        runtime_x.append(k)
-        runtime_y.append(time_sum_k)
 
-    run_time_plot(runtime_x, runtime_y)
+        tss_amount = 0
+        for i in pattern_list_all:
+            tss_amount += len(i)
 
-    return list_best_pattern_for_k
+        df_motifs.loc[k] = [k, round((time.time() - time_start_k), 2),  len(pattern_list_all), tss_amount, tss_amount * k ]
+
+    return list_best_pattern_for_k, df_motifs
+
+

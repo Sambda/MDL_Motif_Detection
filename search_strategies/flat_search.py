@@ -1,6 +1,7 @@
 from search_strategies.search_whole_ts import get_motifs_for_whole_ts
 import params as p
 
+
 # Define k area for searching T
 def get_area_k_flat_search(series, overjump):
     return list(range(int(series.len_sax/2), series.min_pattern_size_non_reduce, -overjump))
@@ -11,9 +12,9 @@ def start_flat_search(series):
     # init start and end point
     area_k = get_area_k_flat_search(series, p.steps_to_overjump)
     print("_________________________________\nFLAT SEARCH\n_________________________________")
-    list_of_pattern = get_motifs_for_whole_ts(series, area_k)
+    list_of_pattern, df_motifs = get_motifs_for_whole_ts(series, area_k)
     list_of_pattern = get_best_pattern(list_of_pattern)
-    return list_of_pattern
+    return list_of_pattern, df_motifs
 
 
 # Create dict with best motifs for all possible different amounts of TSS per motif

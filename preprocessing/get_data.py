@@ -13,17 +13,17 @@ def get_ts(index):
         df = pd.read_csv('data/ecg_2.csv', header=None)
         ts = df.values.tolist()
         #ts = ts[0:10]
-        ts = ts[20:30]
+        ts = ts[0:20]
         ts = sum(ts, [])
 
     elif index == "coffee":
         ts = np.loadtxt('/Users/steffi/Downloads/Coffee/Coffee_TEST.txt')
-        ts = ts[0:100].tolist()
+        ts = ts[0:10].tolist()
         ts = [j for i in ts for j in i]
 
-    elif index == "olive_oil":
+    elif index == "olive":
         ts = np.loadtxt('/Users/steffi/Downloads/OliveOil/OliveOil_Test.txt')
-        ts = ts[0: 10].tolist()
+        ts = ts[0: 15].tolist()
         ts = [j for i in ts for j in i]
 
     elif index == "shampoo":

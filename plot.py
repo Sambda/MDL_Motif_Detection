@@ -1,8 +1,8 @@
 import matplotlib.pyplot as plt
-import utils as u
 import params as p
 from matplotlib.gridspec import GridSpec
 import os
+import collections
 
 
 def simple_plot(ts, title="", x_label='', y_label = ''):
@@ -108,7 +108,10 @@ def create_path_for_plot_saving(data_name, series):
     path = "images/" + str(data_name) + "/"
     path = path + str(len(series.ts)) \
            + "/" + str(series.len_sax) \
-           + "/" + str(series.alphabet_size) + "/"
+           + "/" + str(series.alphabet_size) \
+           + "/" + str(p.kind_of_search) + "/"\
+           + "/" + str(p.differencing) + "/" \
+           + "/" + str(p.power_transformation) + "/"
     if not os.path.exists(path):
         os.makedirs(path)
     return path
@@ -190,7 +193,7 @@ def hist_plot(x, y):
     plt.show()
 
 
-def run_time_plot(x, y, y2=[], y3=[], title = ""):
+def run_time_plot(x, y, y2=[], y3=[], title=""):
     plt.figure(figsize=(10, 4))
     plt.plot(x, y)
     # plt.plot(x, y2)
@@ -198,3 +201,24 @@ def run_time_plot(x, y, y2=[], y3=[], title = ""):
     plt.gca().invert_xaxis()
     plt.title("Runtime ")
     plt.show()
+
+
+def plot_runtime_dict(x, y, title, path):
+    plt.title(title)
+    plt.plot(x, y, "k.")
+    plt.show()
+    if p.save:
+        path = path + title
+        plt.savefig(path, dpi=400, bbox_inches='tight')
+
+
+def runtime_comparision_plot(df_list):
+    title_list = ["ecg", "ecg5D", "olive", "coffee"]
+    for i, t in zip(df_list, title_list):
+        plt.plot(list(range(len(i["runtime"]))), i["runtime"], label=t)
+    plt.title("Runtime")
+    plt.legend(loc="upper right")
+    plt.xlabel('k', fontsize=10)
+    plt.ylabel('runtime in secounds', fontsize=10)
+    plt.gca().invert_xaxis()
+    plt.show

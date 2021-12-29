@@ -1,5 +1,5 @@
 # _______________________ DATA SET _____________________
-ts_number = "ecg"  #coffee, olive_oil, ecg, sinus, traveled_miles, StandWalkJump, Ethanol
+ts_number = "coffee"  #coffee, olive_oil, ecg, sinus, traveled_miles, StandWalkJump, Ethanol
 alphabet_size = 7
 
 # _____________________ PREPROCESSING _______________________
@@ -8,7 +8,7 @@ alphabet_size = 7
 power_transformation = False
 
 # PAA
-number_to_reduce = 30
+number_to_reduce = 15
 reduce_ts_with_max_series_length = False
 max_series_length = 600
 paa = True
@@ -25,7 +25,7 @@ z_norm = True
 
 
 # ________________________ SEARCH _______________________
-kind_of_search = "hs"  # hs, fs
+kind_of_search = "fs"  # hs, fs
 
 
 # ____________________ SAX PARAMETER _______________________
@@ -57,3 +57,6 @@ check_if_other_center_would_be_better = True
 
 # ________________ SAVE RESULT PLOTS -------------------
 save = True
+
+# _______________ PLOT RUNTIME AND TSS AMOUNT DICT VALUES ______
+plot_dict_values = True
