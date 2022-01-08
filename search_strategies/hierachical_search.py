@@ -6,7 +6,6 @@ import objects.ts_object as ts_obj
 import search_strategies.search_helper as search_helper
 from search_strategies.search_whole_ts import get_motifs_for_whole_ts
 import time
-from plot import plot_final_results, run_time_plot
 
 
 # Get search Area for hierachical search
@@ -21,6 +20,8 @@ def start_search(series, area_list):
     # TODO better way for percentage_skip
     percentage_skip = int(series.len_sax/100)
     range_to_skip = percentage_skip if percentage_skip > 1 else 1
+    # delete only 1 TODO
+    range_to_skip = 1
 
     # Get best Motifs in range of k
     dict_best_motif, dict_runtime = get_the_best_k(series, area_list[0], area_list[1], range_to_skip)
@@ -39,7 +40,7 @@ def start_search(series, area_list):
     return dict_best_motif, dict_runtime
 
 
-def get_the_best_k(series, start, end, range_to_search=1, overjump_k= 0):
+def get_the_best_k(series, start, end, range_to_search=1, overjump_k = 0):
     dict_runtime = {}
     dict_best_pattern_all = {"mdl": np.inf}
     for k in range(start, end, range_to_search):
@@ -88,13 +89,19 @@ def get_the_best_k(series, start, end, range_to_search=1, overjump_k= 0):
                             mdl = calculate_mdl_for_ts([mdl_deviation], 2, k, series.len_sax, series.alphabet_size)
 
                             if dict_best_pattern["mdl"] > mdl and mdl < series.worst_case:
-                                dict_best_pattern["mdl"] = mdl_deviation
+                                dict_best_pattern["mdl"] = mdl
+                                dict_best_pattern["mdl_dev"] = mdl_deviation
                                 dict_best_pattern["pattern_1"] = [word_1]
                                 dict_best_pattern["pattern_2"] = [word_2]
                                 dict_best_pattern["k"] = k
                                 dict_best_pattern["index_1"] = [index_1, index_1 + k]
                                 dict_best_pattern["index_2"] = [index_2, index_2 + k]
                                 dict_best_pattern["worst_case"] = series.worst_case
+
+                                # print("k: {}, worst: {} mdl: {}".format(k, series.worst_case, mdl))
+
+                                #print("for k: {} mdl: {} diff_sum: {}, dl_dev: {}".format(k, mdl,sum_of_position_of_changes, mdl_deviation))
+
 
             # Runtime plot
             dict_runtime[k] = round(time.time() - time_start_k, 4)
@@ -106,15 +113,18 @@ def get_the_best_k(series, start, end, range_to_search=1, overjump_k= 0):
 
 
 # Start pattern search in subsequences of the ts
-def start_pattern_search_smaller_series(series, dict_tree, level, logger):
+def start_pattern_search_smaller_series(series, dict_tree, level):
     list_dict_best_motifs = []
     list_best_k_in_area = []
+    level_dict = {}
     index_list = ["index_1", "index_2"]
 
     # Run new search in the sub areas of the two before founden subsequences
     for i in index_list:
         # define new series object of the subsequence
         series_sub = ts_obj.set_new_series(series, dict_tree[i], dict_tree["k"])
+        p.search_area_all.append(dict_tree[i])
+
         # define the searching area
         area_k = get_area_k_hs(series_sub.len_sax)
         print("\n_________________________________\nLEVEL {}.{}\n_________________________________".format(level, i[-1]))
@@ -126,14 +136,19 @@ def start_pattern_search_smaller_series(series, dict_tree, level, logger):
         dict_best_motifs["index_1"] = [dict_best_motifs["index_1"][0] + dict_tree[i][0], dict_best_motifs["index_1"][1] + dict_tree[i][0]]
         dict_best_motifs["index_2"] = [dict_best_motifs["index_2"][0] + dict_tree[i][0], dict_best_motifs["index_2"][1] + dict_tree[i][0]]
         list_dict_best_motifs.append(dict_best_motifs)
-        list_best_k_in_area.append(dict_best_motifs['k'])
-    return list_dict_best_motifs, list_best_k_in_area, runtime_dict
+        if dict_best_motifs["mdl"] < series_sub.worst_case:
+            list_best_k_in_area.append(dict_best_motifs['k'])
+            level_dict[str(str(level)+"."+str(i[-1]))] = dict_best_motifs['k']
+            p.list_of_found_motifs_per_level.append(
+                [dict_best_motifs["index_1"], dict_best_motifs["index_2"], dict_best_motifs["k"], dict_best_motifs["worst_case"], dict_best_motifs["mdl"]])
+
+    return list_dict_best_motifs, list_best_k_in_area, runtime_dict, level_dict
 
 
 def start_hierarchical_search(series_original, logger):
 
     list_of_ks = []
-
+    level_dict_all = {}
     # init start and end point
     area_k = get_area_k_hs(series_original.len_sax)
     level = 1
@@ -142,13 +157,17 @@ def start_hierarchical_search(series_original, logger):
 
     # Init Search based on whole TS
     dict_tree, runtime_dict = start_search(series_original, area_k)
+    level_dict_all[level] = dict_tree['k']
     list_of_ks.append([dict_tree['k']])
+    p.list_of_found_motifs_per_level.append([dict_tree["index_1"], dict_tree["index_2"], dict_tree["k"], dict_tree["worst_case"], dict_tree["mdl"]])
+
 
     while dict_tree["k"] > series_original.min_pattern_size_non_reduce * 2 + 1:
         level += 1
-        dict_list, list_ks, runtime_dict_2 = start_pattern_search_smaller_series(series_original, dict_tree, level, logger)
+        dict_list, list_ks, runtime_dict_2, level_dict = start_pattern_search_smaller_series(series_original, dict_tree, level)
 
         list_of_ks.append(list_ks)
+        level_dict_all = merge_two_dicts(level_dict_all, level_dict)
 
         # Take Motifs with lower MDL for the next search
         dict_tree = dict_list[0] if dict_list[0]["mdl"] <= dict_list[1]["mdl"] else dict_list[1]
@@ -161,7 +180,7 @@ def start_hierarchical_search(series_original, logger):
     # Restart search for spezifiy k's in whole ts
     list_of_pattern, dict_motif = get_motifs_for_whole_ts(series_original, search_area)
 
-    return list_of_pattern, dict_motif
+    return list_of_pattern, dict_motif, level_dict_all
 
 
 def merge_two_dicts(x, y):

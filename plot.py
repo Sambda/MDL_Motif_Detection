@@ -94,40 +94,43 @@ def show_plt(index_list_sum, ts_original, pattern, title, save, path, k):
     plt.show()
 
 
-def get_title(d, series, data_name, indexes_len):
+def get_title(d, series, indexes_len, number_of_reducing, level):
     dl_ts = round(d['mdl'], 2)
     dl_sax = round(series.worst_case, 2)
-    percent = str(round(dl_ts/dl_sax, 2))
-    title = str(data_name) + "\nMDL: " + str(dl_ts) + " DL: " + str(dl_sax) + " Savings in pertentage: " + percent
-    x_axis = "{} different pattern with length: {} where found. \nParams: alphabet_size: {}, smooth: {}, differencing: {}, power: {}, z-norm: {}"\
-        .format(indexes_len, d['k'], p.alphabet_size, p.smooth_fraction, p.differencing, p.power_transformation, p.z_norm)
-    return title, x_axis
+    percent = round((dl_ts/dl_sax)*100, 1)
+    title = r"$\bf{ Level(s) " + str(level) + "}$" + "\n" +str(p.data_name) + "\nDL_TS: " + str(dl_ts) + "\nDL_SAX: " + str(dl_sax) + " | Compression to " + str(percent) + "%"
+  #  x_axis = "Motif with {} subsequences of length {}.\nAlphabet_size: {}, Smooth: {}, Differencing: {}, \nPower Transformation: {}, Z-normalisation: {}"\
+   #     .format(indexes_len, d['k'], p.alphabet_size, p.smooth_fraction, p.differencing, p.power_transformation, p.z_norm)
+    x_axis = "Motif of length {} points, consisting {} subsequences.".format(d['k']*number_of_reducing, indexes_len)
+    return title, x_axis, round(percent/series.alphabet_size,2)
 
 
 def create_path_for_plot_saving(data_name, series):
     path = "images/" + str(data_name) + "/"
-    path = path + str(len(series.ts)) \
-           + "/" + str(series.len_sax) \
-           + "/" + str(series.alphabet_size) \
-           + "/" + str(p.kind_of_search) + "/"\
-           + "/" + str(p.differencing) + "/" \
-           + "/" + str(p.power_transformation) + "/"
+    path = path + str(p.kind_of_search) \
+        + "/" + str(len(series.ts)) \
+        + "/" + str(series.len_sax) \
+        + "/" + str(series.alphabet_size) \
+        + "/" + str(p.differencing) \
+        + "/" + str(p.power_transformation) + "/"
     if not os.path.exists(path):
         os.makedirs(path)
     return path
 
 
 # Plot results
-def print_final_result(list_of_pattern, series, number_of_reducing, data_name, path):
+def print_final_result(list_of_pattern, series, number_of_reducing, path, level_dict_all):
     for i, d in enumerate(list_of_pattern):
         pattern = list_of_pattern[d]
         indexes = [[i[0] * number_of_reducing, i[1] * number_of_reducing] for i in
                    pattern['indexes']] if number_of_reducing else pattern['indexes']
-        title, x_axis_text = get_title(pattern, series, data_name, len(indexes))
-        color_list = ["#FF0000", "#F67332"]
+
+        m = [k for k, v in level_dict_all.items() if float(v) == d]
+        title, x_axis_text, percent = get_title(pattern, series, len(indexes), number_of_reducing, m)
+        color_list = ["#f6a832", "#F67332"]
         x = list(range(0, len(series.ts[:-1])))
 
-        fig, ax = plt.subplots(figsize=(8, 4))
+        fig, ax = plt.subplots(figsize=(10, 5))
         plt.plot(x, series.ts[:-1], "#717170")
 
         index_list = [(list(range(sub_list[0], sub_list[1]))) for sub_list in indexes]
@@ -139,45 +142,53 @@ def print_final_result(list_of_pattern, series, number_of_reducing, data_name, p
                         color = color_list[0]
                     else:
                         color = color_list[1]
-                    plt.plot([x1, x2], [y1, y2], color)
+                    plt.plot([x1, x2], [y1, y2], color,  linewidth=2)
+        title_axis = p.x_axis + "\n" + x_axis_text
+        ax.set_xlabel(title_axis, fontsize=15)
+        ax.set_ylabel(p.y_axis, fontsize=15)
+        plt.title(title, fontsize=16)
 
-        ax.set_xlabel(x_axis_text)
-        plt.title(title)
         if p.save:
-            path_plot = path + str(pattern['k'])
+            path_plot = path + str(percent) + ".png"
             plt.savefig(path_plot, dpi=400, bbox_inches='tight')
         plt.show()
 
 
-def plot_final_results(d, series, number_of_reducing, path, data_name, save):
+def print_final_result_per_level(list_of_pattern, series, number_of_reducing, path, level_dict_all,w):
+    level_dict_all = {y: x for x, y in level_dict_all.items()}
+    for ind,pattern in enumerate(list_of_pattern):
+        indexes = [[i[0] * number_of_reducing, i[1] * number_of_reducing] for i in
+                   pattern[0:2]] if number_of_reducing else pattern[0:2]
 
-    indexes = [[i[0] * number_of_reducing, i[1] * number_of_reducing] for i in
-               d['indexes']] if number_of_reducing else d['indexes']
-    title, x_axis_text = get_title(d, series, data_name, len(indexes))
-    color_list = ["#FF0000", "#F67332"]
-    x = list(range(0, len(series.ts[:-1])))
+        title = str("Level: {}".format(level_dict_all[pattern[2]], pattern[4], pattern[3]))
+        x_axis_text, percent = "",""
+        x_axis_text = indexes
 
-    fig, ax = plt.subplots(figsize=(8, 4))
-    plt.plot(x, series.ts[:-1], "#717170")
+        color_list = ["#f6a832", "#F67332"]
+        x = list(range(0, len(series.ts[:-1])))
 
-    index_list = [(list(range(sub_list[0], sub_list[1]))) for sub_list in indexes]
-    for x1, x2, y1, y2 in zip(x, x[1:], series.ts, series.ts[1:]):
+        fig, ax = plt.subplots(figsize=(10, 5))
+        plt.plot(x, series.ts[:-1], "#717170")
 
-        for color_tmp, ind in enumerate(index_list):
-            if x1 in ind:
-                if color_tmp % 2:
-                    color = color_list[0]
-                else:
-                    color = color_list[1]
-                plt.plot([x1, x2], [y1, y2], color)
+        index_list = [(list(range(sub_list[0], sub_list[1]))) for sub_list in indexes]
+        for x1, x2, y1, y2 in zip(x, x[1:], series.ts, series.ts[1:]):
 
-    ax.set_xlabel(x_axis_text)
-    plt.title(title)
-    if save:
-        path = path + str(d['k'])
-        plt.savefig(path, dpi=400, bbox_inches='tight')
-    plt.show()
+            for color_tmp, ind in enumerate(index_list):
+                if x1 in ind:
+                    if color_tmp % 2:
+                        color = color_list[0]
+                    else:
+                        color = color_list[1]
+                    plt.plot([x1, x2], [y1, y2], color,  linewidth=2)
+        title_axis = p.x_axis + "\n" + str(x_axis_text)
+        ax.set_xlabel(title_axis, fontsize=15)
+        ax.set_ylabel(p.y_axis, fontsize=15)
+        plt.title(title, fontsize=16)
 
+        if p.save:
+            path_plot = path + str(percent) + ".png"
+            plt.savefig(path_plot, dpi=400, bbox_inches='tight')
+        plt.show()
 
 def hist_plot(x, y):
     fig = plt.figure()
@@ -206,7 +217,6 @@ def run_time_plot(x, y, y2=[], y3=[], title=""):
 def plot_runtime_dict(x, y, title, path):
     plt.title(title)
     plt.plot(x, y, "k.")
-    plt.show()
     if p.save:
         path = path + title
         plt.savefig(path, dpi=400, bbox_inches='tight')
@@ -219,6 +229,6 @@ def runtime_comparision_plot(df_list):
     plt.title("Runtime")
     plt.legend(loc="upper right")
     plt.xlabel('k', fontsize=10)
-    plt.ylabel('runtime in secounds', fontsize=10)
+    plt.ylabel('runtime in seconds', fontsize=10)
     plt.gca().invert_xaxis()
     plt.show

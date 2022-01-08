@@ -6,7 +6,7 @@ from search_strategies.flat_search import start_flat_search
 from utils.runtime_helper import get_min_possible_size
 from objects.ts_object import set_series_object
 from plot import simple_plot
-from plot import print_final_result, create_path_for_plot_saving, plot_runtime_dict
+from plot import print_final_result, create_path_for_plot_saving, plot_runtime_dict, print_final_result_per_level
 from Logging.logger_setup import init_logger
 
 
@@ -20,14 +20,15 @@ def plot_dict_values(df_motifs, path):
 
 # Start Search
 def start_search(strategy, series_original, logger):
+    level_dict = {}
     if strategy == "hs":
-        list_pattern, df_motifs = start_hierarchical_search(series_original, logger)
+        list_pattern, df_motifs, level_dict = start_hierarchical_search(series_original, logger)
 
     elif strategy == "fs":
         list_pattern, df_motifs = start_flat_search(series_original)
 
     logger.set_text("Runtime whole TS:\n{}".format(df_motifs))
-    return list_pattern, df_motifs
+    return list_pattern, df_motifs, level_dict
 
 
 def run_main():
@@ -49,13 +50,14 @@ def run_main():
     # Init Logger
     path = create_path_for_plot_saving(ts_number, series_original)
     logger = init_logger(series_original, path)
+    print(path)
 
     # Plot reduced data
     simple_plot(series_original.ts, "Original Data")
     simple_plot(series_original.ts_norm, "Reduced Data")
 
     # Start first search
-    list_of_pattern, df_motifs = start_search(p.kind_of_search, series_original, logger)
+    list_of_pattern, df_motifs, level_dict = start_search(p.kind_of_search, series_original, logger)
 
     # Plot runtime images
     plot_dict_values(df_motifs, path)
@@ -66,9 +68,14 @@ def run_main():
     # Log list
     logger.set_best_motifs(list_of_pattern)
     logger.set_text(str("Time complete: " + str(round(((time.time() - time_start)/60), 2)) + " minutes"))
-
+    w = p.list_of_found_motifs_per_level
+   # print(w)
+   # w = [[[i[0][0] * p.number_to_reduce, i[0][1] * p.number_to_reduce],
+   #       [i[1][0] * p.number_to_reduce, i[1][1] * p.number_to_reduce]] for i in w]
+   # print(w)
+    print_final_result_per_level(w, series_original, p.number_to_reduce, path, level_dict,w)
     # Print final plot for first search
-    print_final_result(list_of_pattern, series_original, p.number_to_reduce, ts_number, path)
+    print_final_result(list_of_pattern, series_original, p.number_to_reduce, path, level_dict)
 
 
 if __name__ == "__main__":

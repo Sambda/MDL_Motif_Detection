@@ -46,8 +46,7 @@ def get_ts_paa(ts):
     return ts_paa,reduce_size
 
 
-def smooth_data(data):
-    smooth_fraction = p.smooth_fraction
+def smooth_data(data, smooth_fraction=p.smooth_fraction):
 
     # operate smoothing
     smoother = LowessSmoother(smooth_fraction=smooth_fraction, iterations=1)

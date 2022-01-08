@@ -32,6 +32,7 @@ class Logger(object):
                          "\nDouble Sax: {} "
                          "\nSmooth: {} "
                          "\nSmooth Fraction: {}"
+                         "\nFilename: {}"
                          "\nZ-Normalisation: {} "
                          "\nBreakpoint setting Value: {}"
                          "\nKind of breakpoints: {}"
@@ -45,6 +46,7 @@ class Logger(object):
                              series.double,
                              p.smooth,
                              p.smooth_fraction,
+                             self.filename,
                              p.z_norm,
                              p.quantil,
                              p.kind_of_breakpoints,

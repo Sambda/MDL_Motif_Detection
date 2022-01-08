@@ -11,3 +11,17 @@ def get_min_possible_size(alphabet_size, len_ts, k_area, mdl_deviation=1.51):
         mdl = calculate_mdl_for_ts(mdl_deviation_list, max_possible_tss, k, len_ts, alphabet_size)
         if dl > mdl:
             return k
+
+
+# Dictionary, for which k-value which difference value can still be profitable at all.
+# {1: -1, 2: -1, 3: -1, 4: 0, 5: 0, 6: 1, 7: 1, 8: 1, 9: 2 ...}
+def creat_dict_threshold(alphabet_size, len_sax):
+    dict_threshold = {}
+    for k in range(int(len_sax / 2) + 1):
+        worst_case = h.log_2(k, alphabet_size)
+        for i in range(k):
+            mdl = h.log_2(1, len_sax) + h.log_star(i) + h.log_2(i, k) + i*2
+            if mdl > worst_case:
+                dict_threshold[k] = (i - 1)
+                break
+    return dict_threshold

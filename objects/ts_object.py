@@ -5,6 +5,7 @@ import re
 import params as p
 from preprocessing.sax import apply_sax
 import copy
+from utils.runtime_helper import creat_dict_threshold
 
 
 # Define class
@@ -12,7 +13,7 @@ class Series(object):
     def __init__(self, ts: list, ts_norm: list, double: int, data_number: int, alphabet_size: int,
                  min_possible_pattern_size: int, time,
                  sax: list = [], sax_2: list = [], sax_numeric: list = [], sax_numeric_2: list = [],
-                 candidate_list: list = [], mdl_deviation_lists: list = [], index_lists: list = [],
+                 candidate_list: list = [], mdl_deviation_lists: list = [], index_lists: list = []
                  ):
         self.ts = ts
         self.ts_norm = ts_norm
@@ -31,6 +32,8 @@ class Series(object):
         self.candidate_list = candidate_list
         self.mdl_deviation_lists = mdl_deviation_lists
         self.index_lists = index_lists
+        self.dev_threshold = {}
+
 
 
 # abcdaa -> 123411
@@ -51,13 +54,16 @@ def set_new_series(series, index, area_length):
     series_s.ts_norm = series.ts_norm[index[0]:index[1]]
     series_s.len_sax = area_length
     series_s.worst_case = log_2(area_length, series.alphabet_size)
+    # Maybe
+    series_s.dev_threshold = creat_dict_threshold(series_s.alphabet_size, series_s.len_sax)
     return series_s
 
 
 def set_series_object(ts, ts_norm, data_number, alphabet_size, min_possible_pattern_size, list_of_breaks=[]):
     time = datetime.now().strftime('%d%m%H%M%S')
-    series = Series(ts, ts_norm, p.double_sax, data_number, alphabet_size,min_possible_pattern_size, time)
+    series = Series(ts, ts_norm, p.double_sax, data_number, alphabet_size, min_possible_pattern_size, time)
     series = apply_sax(series)
+    series.dev_threshold = (creat_dict_threshold(alphabet_size, series.len_sax))
     series.worst_case = log_2(series.len_sax, series.alphabet_size)
     series.sax_numeric = create_number_series("".join(series.sax), series.alphabet_list)
     series.sax_numeric_2 = create_number_series("".join(series.sax_2), series.alphabet_list) if series.double else ""

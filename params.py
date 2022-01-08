@@ -1,6 +1,6 @@
 # _______________________ DATA SET _____________________
 ts_number = "coffee"  #coffee, olive_oil, ecg, sinus, traveled_miles, StandWalkJump, Ethanol
-alphabet_size = 7
+alphabet_size = 5
 
 # _____________________ PREPROCESSING _______________________
 
@@ -18,14 +18,14 @@ smooth = True
 smooth_fraction = 0.01
 
 # Differencing
-differencing = True
+differencing = False
 
 # Z Normalisation
 z_norm = True
 
 
 # ________________________ SEARCH _______________________
-kind_of_search = "fs"  # hs, fs
+kind_of_search = "hs"  # hs, fs
 
 
 # ____________________ SAX PARAMETER _______________________
@@ -46,7 +46,7 @@ search_again_for_best_ks = True
 
 
 # ___________________ RUNTIME _______________________________
-steps_to_overjump = 1
+steps_to_overjump = 0
 
 
 # ____________________DL ENCODING _______________________
@@ -57,6 +57,11 @@ check_if_other_center_would_be_better = True
 
 # ________________ SAVE RESULT PLOTS -------------------
 save = True
-
+data_name = ""
+x_axis =""
+y_axis =""
 # _______________ PLOT RUNTIME AND TSS AMOUNT DICT VALUES ______
 plot_dict_values = True
+
+list_of_found_motifs_per_level = []
+search_area_all = []
