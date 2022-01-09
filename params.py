@@ -14,18 +14,18 @@ max_series_length = 600
 paa = True
 
 # Smoothing
-smooth = True
+smooth = False
 smooth_fraction = 0.01
 
 # Differencing
 differencing = False
 
 # Z Normalisation
-z_norm = True
+z_norm = False
 
 
 # ________________________ SEARCH _______________________
-kind_of_search = "hs"  # hs, fs
+kind_of_search = "fs"  # hs, fs
 
 
 # ____________________ SAX PARAMETER _______________________
@@ -46,7 +46,7 @@ search_again_for_best_ks = True
 
 
 # ___________________ RUNTIME _______________________________
-steps_to_overjump = 0
+steps_to_overjump = 3
 
 
 # ____________________DL ENCODING _______________________
@@ -65,3 +65,4 @@ plot_dict_values = True
 
 list_of_found_motifs_per_level = []
 search_area_all = []
+plot_levels = False

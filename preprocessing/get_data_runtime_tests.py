@@ -6,33 +6,69 @@ from scipy.io import arff
 from preprocessing.preprocess_data import preprocess_data
 import params as p
 from sklearn.decomposition import PCA
+from preprocessing.load_audio_data import load_with_librosa
 
 
 def read_data(index):
     if index == "ecg":
         df = pd.read_csv('data/ecg_2.csv', header=None)
         ts = df.values.tolist()
-        ts = ts[2:9] + ts[10:11] + ts[12:13] + ts[15:16]
+        #ts = ts[2:9] + ts[10:11] + ts[12:13] + ts[15:16] + ts[18:35]
+        #ts = ts[0:5] + ts[31:32] + ts[30:31] + ts[114:115] + ts[11:13] + ts[120:121] + ts[130:135]
+        ts = ts[4:5] + ts[314:315] + ts[11:13] + ts[311:313] + ts[130:132]# + ts[316:317]
+
         ts = sum(ts, [])
     elif index == "olive":
         ts = np.loadtxt('/Users/steffi/Downloads/OliveOil/OliveOil_Test.txt')
-        ts = ts[0: 10].tolist()
+        #ts = ts[0: 10].tolist()
+        ts = ts[0:20].tolist()
         ts = [j for i in ts for j in i]
     elif index == "coffee":
         ts = np.loadtxt('/Users/steffi/Downloads/Coffee/Coffee_TEST.txt')
-        ts = ts[0:11].tolist()
+       # ts = ts[0:11].tolist()
+        ts = ts[0:20].tolist()
         ts = [j for i in ts for j in i]
     elif index == "traveled_miles":
         df = pd.read_csv('data/trav_miles_long.csv')
         ts = list(df['TRFVOLUSM227NFWA'])
         ts = np.array(ts)
-        ts = ts[0:588]
+        ts = ts[0:481]
+    elif index == "audio":
+        path = "data/mdl4.wav" #mdl3 #mdl6
+        ts = load_with_librosa(path)
+
+    elif index == "beer":
+        df = pd.read_csv(
+            '/Users/steffi/PycharmProjects/MDL_Clustering/MDL_PULP_MOTIF_DETECTION/data/BeerWineLiquor.csv')
+        ts = list(df['beer'])
+
+    elif index =="Stand":
+        path = "/Users/steffi/PycharmProjects/MDL/data/StandWalkJumpDimension1_TEST.arff"
+        ts = []
+        data1 = arff.loadarff(open(path, 'rt'))
+        list_to_append = list(range(2))
+        for i in list_to_append:
+            df1 = list(data1[0][i])[:-1]
+            ts.extend(df1)
+        ts = ts[0:5500]
+
+    elif index == "Stand2":
+        path = "/Users/steffi/PycharmProjects/MDL/data/StandWalkJumpDimension1_TEST.arff"
+        ts = []
+        data1 = arff.loadarff(open(path, 'rt'))
+        list_to_append = list(range(3))
+        for i in list_to_append:
+            df1 = list(data1[0][i])[:-1]
+            print(list(data1[0][i])[-1])
+            ts.extend(df1)
 
     ts_norm = preprocess_data(ts)
     print("len", len(ts_norm))
-    #ts = ts[0:100]
-   # ts_norm = ts_norm[0:100]
+   # ts = ts[0:100*p.number_to_reduce]
+    #ts_norm = ts_norm[0:100]
     return ts, ts_norm
+
+
 
 
 def read_data2(index):

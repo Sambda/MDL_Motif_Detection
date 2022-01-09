@@ -90,7 +90,7 @@ def show_plt(index_list_sum, ts_original, pattern, title, save, path, k):
     plt.title(title)
     if save:
         path = path + str(k)
-        plt.savefig(path, dpi=400, bbox_inches='tight')
+        plt.savefig(path, dpi=200, bbox_inches='tight')
     plt.show()
 
 
@@ -98,7 +98,11 @@ def get_title(d, series, indexes_len, number_of_reducing, level):
     dl_ts = round(d['mdl'], 2)
     dl_sax = round(series.worst_case, 2)
     percent = round((dl_ts/dl_sax)*100, 1)
-    title = r"$\bf{ Level(s) " + str(level) + "}$" + "\n" +str(p.data_name) + "\nDL_TS: " + str(dl_ts) + "\nDL_SAX: " + str(dl_sax) + " | Compression to " + str(percent) + "%"
+    if str(level)[2:3] == "]":
+        level = str(1)
+    else:
+        level = str(level)[2:3]
+    title = r"$\bf{ Level: " + level + "}$" + "\n" +str(p.data_name) + "\nDL_TS: " + str(dl_ts) + "\nDL_SAX: " + str(dl_sax) + " | Compression to " + str(percent) + "%"
   #  x_axis = "Motif with {} subsequences of length {}.\nAlphabet_size: {}, Smooth: {}, Differencing: {}, \nPower Transformation: {}, Z-normalisation: {}"\
    #     .format(indexes_len, d['k'], p.alphabet_size, p.smooth_fraction, p.differencing, p.power_transformation, p.z_norm)
     x_axis = "Motif of length {} points, consisting {} subsequences.".format(d['k']*number_of_reducing, indexes_len)
@@ -149,20 +153,19 @@ def print_final_result(list_of_pattern, series, number_of_reducing, path, level_
         plt.title(title, fontsize=16)
 
         if p.save:
-            path_plot = path + str(percent) + ".png"
-            plt.savefig(path_plot, dpi=400, bbox_inches='tight')
+            path_plot = path + str(percent) + ".pdf"
+            plt.savefig(path_plot, dpi=200, bbox_inches='tight')
         plt.show()
 
 
 def print_final_result_per_level(list_of_pattern, series, number_of_reducing, path, level_dict_all,w):
     level_dict_all = {y: x for x, y in level_dict_all.items()}
+    levles = ["1", "2.1", "2.2", "3.1", "3.2", "4.1", "4.2", "5.1", "5.2", "6.1", "6.2"]
     for ind,pattern in enumerate(list_of_pattern):
         indexes = [[i[0] * number_of_reducing, i[1] * number_of_reducing] for i in
                    pattern[0:2]] if number_of_reducing else pattern[0:2]
-
-        title = str("Level: {}".format(level_dict_all[pattern[2]], pattern[4], pattern[3]))
-        x_axis_text, percent = "",""
-        x_axis_text = indexes
+        title = str(r"$\bf{Level: "+str(levles[ind])+"}$" + "\n For search area: DL_sax {} | DL_TS: {}".format(pattern[3], round(pattern[4]),2))
+        x_axis_text = "2 pattern of length {} where found.".format(pattern[2]*p.number_to_reduce)
 
         color_list = ["#f6a832", "#F67332"]
         x = list(range(0, len(series.ts[:-1])))
@@ -180,14 +183,14 @@ def print_final_result_per_level(list_of_pattern, series, number_of_reducing, pa
                     else:
                         color = color_list[1]
                     plt.plot([x1, x2], [y1, y2], color,  linewidth=2)
-        title_axis = p.x_axis + "\n" + str(x_axis_text)
+        title_axis = str(x_axis_text) + "\n" + p.x_axis
         ax.set_xlabel(title_axis, fontsize=15)
         ax.set_ylabel(p.y_axis, fontsize=15)
         plt.title(title, fontsize=16)
 
         if p.save:
-            path_plot = path + str(percent) + ".png"
-            plt.savefig(path_plot, dpi=400, bbox_inches='tight')
+            path_plot = path + str(indexes) + ".pdf"
+            plt.savefig(path_plot, dpi=200, bbox_inches='tight')
         plt.show()
 
 def hist_plot(x, y):
@@ -212,14 +215,6 @@ def run_time_plot(x, y, y2=[], y3=[], title=""):
     plt.gca().invert_xaxis()
     plt.title("Runtime ")
     plt.show()
-
-
-def plot_runtime_dict(x, y, title, path):
-    plt.title(title)
-    plt.plot(x, y, "k.")
-    if p.save:
-        path = path + title
-        plt.savefig(path, dpi=400, bbox_inches='tight')
 
 
 def runtime_comparision_plot(df_list):

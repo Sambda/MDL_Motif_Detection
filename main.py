@@ -3,19 +3,13 @@ from preprocessing.get_data_runtime_tests import read_data
 import params as p
 from search_strategies.hierachical_search import start_hierarchical_search
 from search_strategies.flat_search import start_flat_search
-from utils.runtime_helper import get_min_possible_size
+from utils.runtime_helper import get_min_possible_size, get_best_pattern
 from objects.ts_object import set_series_object
 from plot import simple_plot
-from plot import print_final_result, create_path_for_plot_saving, plot_runtime_dict, print_final_result_per_level
+from plot import print_final_result, create_path_for_plot_saving, print_final_result_per_level
 from Logging.logger_setup import init_logger
-
-
-def plot_dict_values(df_motifs, path):
-    if p.plot_dict_values:
-        plot_runtime_dict(df_motifs["k"], df_motifs['runtime'], "dict_runtime", path)
-        plot_runtime_dict(df_motifs["k"], df_motifs['motif_amount'], "motif_amount", path)
-        plot_runtime_dict(df_motifs["k"], df_motifs['tss_amount'], "tss_amount", path)
-        plot_runtime_dict(df_motifs["k"], df_motifs['point_amount'], "point_amount", path)
+from search_strategies.second_search import set_new_conditions
+from plots.runtime_plots import plot_dict_values
 
 
 # Start Search
@@ -69,13 +63,21 @@ def run_main():
     logger.set_best_motifs(list_of_pattern)
     logger.set_text(str("Time complete: " + str(round(((time.time() - time_start)/60), 2)) + " minutes"))
     w = p.list_of_found_motifs_per_level
-   # print(w)
-   # w = [[[i[0][0] * p.number_to_reduce, i[0][1] * p.number_to_reduce],
-   #       [i[1][0] * p.number_to_reduce, i[1][1] * p.number_to_reduce]] for i in w]
-   # print(w)
-    print_final_result_per_level(w, series_original, p.number_to_reduce, path, level_dict,w)
+
+    if p.kind_of_search == "hs" and p.plot_levels == True:
+        print_final_result_per_level(w, series_original, p.number_to_reduce, path, level_dict,w)
     # Print final plot for first search
     print_final_result(list_of_pattern, series_original, p.number_to_reduce, path, level_dict)
+
+    best_indexes = get_best_pattern(list_of_pattern)
+    ts, ts_norm, original_index, list_of_breaks = set_new_conditions(best_indexes, ts, ts_norm, p.number_to_reduce)
+    # Set new Series Object
+
+    if len(ts_norm) > series_original.min_pattern_size_non_reduce * 2 + 1:
+        series = set_series_object(ts, ts_norm, ts_number, alphabet_size, min_k, list_of_breaks)
+        # Search again in not used Areas
+        list_of_pattern, series, indexes = start_search(p.kind_of_search, series, logger)
+        print_final_result(list_of_pattern, series_original, p.number_to_reduce, path, level_dict)
 
 
 if __name__ == "__main__":

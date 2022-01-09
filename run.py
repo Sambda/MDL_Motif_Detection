@@ -6,9 +6,17 @@ data_list = ["olive", "coffee"]# "ecg", "traveled_miles",
 datanames = ["Traveled miles per month", "Olive Spectroscopy", "Coffee Spectroscopy"] #"ECH Heart Rate",
 x_y_axis = [["months", "millions of miles"], ["wave number [1/cm]","arbitrary absorbance"], ["wave number [1/cm]","arbitrary absorbance"], ["sample points", "micro volts"]]
 #data_list = ["coffee", "olive", "ecg", "traveled_miles"]
-data_list = ["ecg"]
-dict_number_to_reduce = {"ethanol": 100, "ecg": 6, "coffee": 21, "olive": 25, "traveled_miles": 2, "beer": 1, "ecg5D": 4, "faces": 2, "eyes": 65, "random": 3, "eyes_pca": 1, "Stand": 13}
-dict_names = {"ecg": ["ECH Heart Rate","sample points", "micro volts"], "coffee": ["Coffee spectrograph","wave number [1/cm]","arbitrary absorbance"],  "olive": ["Olive oli spectrograph","wave number [1/cm]","arbitrary absorbance"], "traveled_miles": ["Traveled miles per month","months", "millions of miles"]}
+data_list = ["Wafer"]
+dict_number_to_reduce = {"ethanol": 100, "ecg": 6, "coffee": 21, "olive": 25, "traveled_miles": 1, "beer": 1, "ecg5D": 4, "faces": 2, "eyes": 65, "random": 3, "eyes_pca": 1, "Stand2": 13, 'audio': 5, "Wafer":17}
+dict_names = {"ecg": ["ECH Heart Rate","sample points", "micro volts"],
+              "coffee": ["Coffee spectrograph","wave number [1/cm]","arbitrary absorbance"],
+              "olive": ["Olive oli spectrograph","wave number [1/cm]","arbitrary absorbance"],
+              "traveled_miles": ["Traveled miles per month","months", "millions of miles"],
+              "audio":["Audio","waves","sample points"],
+              "beer":["Beer", "liter", "sample points"] ,
+              "Stand2":["Stand2", "sample points", "height"],
+              "Stand2":["Stand2", "sample points", "height"],
+              "Wafer":["Stand2", "sample points", "height"] }
 alphabet_size_list = [5]
 power_transform_list = [False]
 differencing_list = [False]

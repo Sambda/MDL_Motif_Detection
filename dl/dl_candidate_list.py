@@ -24,6 +24,7 @@ def mdl_for_candidate_list(subsequence, series):
     word_1_len_candidate_list_before = 0
 
     sum_of_position_of_changes_old = np.inf
+    sum_of_position_of_changes = 0
     index_2_to_skip = 0
 
     for index_1, word_1 in enumerate(subsequence.words[:-1]):

@@ -1,6 +1,6 @@
 import dl.dl_helper as h
 from dl.dl_ts import calculate_mdl_for_ts
-
+import numpy as np
 
 # Calculate die minimal motif length for which it could be rentable
 def get_min_possible_size(alphabet_size, len_ts, k_area, mdl_deviation=1.51):
@@ -25,3 +25,12 @@ def creat_dict_threshold(alphabet_size, len_sax):
                 dict_threshold[k] = (i - 1)
                 break
     return dict_threshold
+
+
+def get_best_pattern(list_of_pattern):
+    mdl_min = np.inf
+    for i in list_of_pattern:
+        if list_of_pattern[i]["mdl"] < mdl_min:
+            indexes = list_of_pattern[i]["indexes"]
+            mdl_min = list_of_pattern[i]["mdl"]
+    return indexes

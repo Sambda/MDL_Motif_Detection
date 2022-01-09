@@ -21,7 +21,7 @@ def start_search(series, area_list):
     percentage_skip = int(series.len_sax/100)
     range_to_skip = percentage_skip if percentage_skip > 1 else 1
     # delete only 1 TODO
-    range_to_skip = 1
+    #range_to_skip = 3
 
     # Get best Motifs in range of k
     dict_best_motif, dict_runtime = get_the_best_k(series, area_list[0], area_list[1], range_to_skip)
